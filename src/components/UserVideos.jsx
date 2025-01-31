@@ -7,7 +7,7 @@ const UserVideos = ({stream}) => {
    }
   }, [stream])
   return (
-    <video ref={videoRef} style={{width:'200px'}} muted autoPlay ></video>
+    <video ref={videoRef} style={{width:'200px'}} muted autoPlay className="remoteVideos"></video>
   )
 }
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import Peer from 'peerjs';
 import { v4 as uuidv4 } from 'uuid';
@@ -6,11 +6,12 @@ import { v4 as uuidv4 } from 'uuid';
 const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
-  const [socket, setSocket] = useState(null);
-  const [user, setUser] = useState(null);
+  const socketRef = useRef(null);
+  const userRef = useRef(null);
   const [stream, setStream] = useState(null);
-  const [remoteStreams, setRemoteStreams] = useState([]);
-
+  const [remoteStreams, setRemoteStreams] = useState([]);  
+  const codeRef = useRef(null); 
+  const langRef = useState(null);
   const getUserStream = async () => {
   
       const myStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
@@ -20,14 +21,14 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const id = uuidv4();
     const socketInst = io("http://localhost:3000");
-    setSocket(socketInst);
+    socketRef.current = socketInst;
     const newPeer = new Peer(id, {
       host: "localhost",
       port: 9000,
       path: "/myapp",
     });
 
-    setUser(newPeer);
+    userRef.current = newPeer;
     getUserStream(); 
 
     return () => {
@@ -35,12 +36,17 @@ export const SocketProvider = ({ children }) => {
       newPeer.destroy(); 
     };
   }, []);
-
+  const handleCodeRef = (code)=>{
+     codeRef.current = code;
+  }
+  const handleLangRef = (lang)=>{
+     langRef.current = lang;
+  }
   useEffect(() => {
-    if (!user || !stream) return;
-    socket.on('room-update', ({ peerId }) => {
-      if (peerId === user.id) return;
-      const call = user.call(peerId, stream);
+    if (!userRef.current || !stream) return;
+    socketRef.current.on('room-update', ({ peerId, socketId }) => {
+      if (peerId === userRef.current.id) return;
+      const call = userRef.current.call(peerId, stream);
       call.on('stream', (remoteStream) => {
         setRemoteStreams((prevStreams) => {
           if (!prevStreams.find((stream) => stream.peerId === peerId)) {
@@ -48,9 +54,10 @@ export const SocketProvider = ({ children }) => {
           }
           return prevStreams;
         });
+        socketRef.current.emit("sync-code", ({socketId, code:codeRef.current,newLanguage:langRef.current}));
       });
     });
-    user.on('call', (call) => {
+    userRef.current.on('call', (call) => {
       call.answer(stream);
       call.on('stream', (remoteStream) => {
         setRemoteStreams((prev) => {
@@ -62,10 +69,10 @@ export const SocketProvider = ({ children }) => {
       });
     });
 
-  }, [user, stream, socket]);
+  }, [userRef.current, stream, socketRef.current]);
 
   return (
-    <SocketContext.Provider value={{ socket, user, stream, remoteStreams,setRemoteStreams }}>
+    <SocketContext.Provider value={{ socket:socketRef.current, user:userRef.current, stream, remoteStreams,setRemoteStreams,handleCodeRef,handleLangRef}}>
       {children}
     </SocketContext.Provider>
   );

@@ -1,7 +1,12 @@
+*{
+  margin: 0;
+  padding: 0;
+}
 .main{
   width: 100vw;
   height: 100vh;
   margin: 0px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -112,4 +117,70 @@
 }
 
 
+/* code Execution-->*/
+.code-Execution{
+  width: 20%;
+  background-color: #fff;
+  width: 20%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.input-part{
+  background: #fff;
+  padding: 5px;
+  height: 30%;
+  width: 95%;
+}
+.input-part h2{
+  background-color: #fff;
+  color: black;
+}
+.input-part textarea{
+  margin: auto;
+  width: 95%;
+  background-color: #fff;
+  height: 25vh;
+  border:none;
+  color: black;
+  font-size: 25px;
+  padding: 5px;
+}
+.output-part{
+  height: 70%;
+  color: black;
+  background-color: #fff;
+  width: 95%;
+  padding: 10px;
+}
+.output-part h2{
+  color: black;
+  background-color: #fff;
+}
+.output-part p{
+  background-color: #fff;
+  color: green;
+  height: 95%;
+  overflow: auto;
+  scrollbar-width: thin;
+  font-size: 20px;
+}
 
+.runButton{
+  background-color: #fff;
+  color: black;
+  font-size: 20px;
+  border: 2px solid rgb(19, 160, 19);
+  background-color: rgb(19, 160, 19);
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.runButton:hover{
+  border: 2px solid black;
+}
+.remoteVideos{
+  margin: 20px;
+}
